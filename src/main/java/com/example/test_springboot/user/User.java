@@ -1,11 +1,12 @@
 package com.example.test_springboot.user;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
-
 
 @NoArgsConstructor
 @Getter
@@ -14,9 +15,27 @@ import java.sql.Timestamp;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
+    @Column(unique = true)
     private String username;
     private String password;
     private String email;
+
+    @CreationTimestamp // 자동 now() 들어감
     private Timestamp createdAt;
+
+    @Builder
+    public User(Integer id, String username, String password, String email, Timestamp createdAt) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.createdAt = createdAt;
+    }
+
+    // 회원정보 수정 setter
+    public void update(String password, String email) {
+        this.password = password;
+        this.email = email;
+    }
 }

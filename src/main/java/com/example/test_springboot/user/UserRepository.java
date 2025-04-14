@@ -5,37 +5,27 @@ import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-@RequiredArgsConstructor
 @Repository
+@RequiredArgsConstructor
 public class UserRepository {
     private final EntityManager em;
 
-    public void save(String username, String password, String email) {
-        Query q = em.createNativeQuery("insert into user_tb (username, password, email) values (?, ?, ?)");
-        q.setParameter(1, username);
-        q.setParameter(2, password);
-        q.setParameter(3, email);
-        q.executeUpdate();
-    }
-
     public User findByUsername(String username) {
-        Query q = em.createNativeQuery("select * from user_tb where username = ?", User.class);
-        q.setParameter(1, username);
-        return (User) q.getSingleResult();
+        Query query = em.createQuery("select u from User u where u.username = :username");
+        query.setParameter("username", username);
+
+        try {
+            return (User) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
-    public User findById(int userId) {
-        Query q = em.createNativeQuery("select * from user_tb where id = ?", User.class);
-        q.setParameter(1, userId);
-        return (User) q.getSingleResult();
+    public void save(User entity) {
+        em.persist(entity);
     }
 
-    public User updateById(String password, String email, int userId) {
-        Query q = em.createNativeQuery("update user_tb set password = ?, email = ? where id = ?");
-        q.setParameter(1, password);
-        q.setParameter(2, email);
-        q.setParameter(3, userId);
-        q.executeUpdate();
-        return findById(userId);
+    public User findById(Integer id) {
+        return em.find(User.class, id);
     }
 }
